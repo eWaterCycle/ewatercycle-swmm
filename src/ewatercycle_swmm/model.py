@@ -11,23 +11,24 @@ from ewatercycle.container import ContainerImage
 
 
 class SWMMMethods(eWaterCycleModel):
-    """The eWatercycle LeakyBucket model.
-    
-    Setup args:
-        leakiness: The "leakiness" of the bucket in [d-1].
+    """The eWatercycle SWMM model.
     """
     forcing: None  # The model does not require forcing.
     parameter_set: ParameterSet  # The model has no parameter set.
 
     _config: dict = {
         "inp_file": "",
-        "data_file": "",
     }
 
     def _make_cfg_file(self, **kwargs) -> Path:
         """Write model configuration file."""
-        self._config["inp_file"] = str(self.parameter_set["inp_file"])
-        self._config["data_file"] = str(self.parameter_set["data_file"])
+        # self._config["inp_file"] = str(self.parameter_set["config"]["inp_file"])
+        # self._config["data_file"] = str(self.parameter_set["config"]["data_file"])
+
+        self._config["inp_file"] = str(self.parameter_set.config)
+        data_file = str(self.parameter_set.config).replace(".inp", ".data")
+        if data_file.exists():
+            self._config["data_file"] = data_file
 
         for kwarg in kwargs:  # Write any kwargs to the config.
             self._config[kwarg] = kwargs[kwarg]
