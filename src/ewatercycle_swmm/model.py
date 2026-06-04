@@ -4,35 +4,35 @@ from collections.abc import ItemsView
 from pathlib import Path
 from typing import Any
 
-from ewatercycle.base.forcing import GenericLumpedForcing
+# from ewatercycle.base.forcing import GenericDistributedForcing
+from ewatercycle.base.parameter_set import ParameterSet
 from ewatercycle.base.model import ContainerizedModel, eWaterCycleModel
 from ewatercycle.container import ContainerImage
 
 
-class LeakyBucketMethods(eWaterCycleModel):
+class SWMMMethods(eWaterCycleModel):
     """The eWatercycle LeakyBucket model.
     
     Setup args:
         leakiness: The "leakiness" of the bucket in [d-1].
     """
-    forcing: GenericLumpedForcing  # The model requires forcing.
-    parameter_set: None  # The model has no parameter set.
+    forcing: None  # The model does not require forcing.
+    parameter_set: ParameterSet  # The model has no parameter set.
 
     _config: dict = {
-        "forcing_file": "",
-        "precipitation_file": "",
-        "leakiness": 0.05,
+        "inp_file": "",
+        "data_file": "",
     }
 
     def _make_cfg_file(self, **kwargs) -> Path:
         """Write model configuration file."""
-        self._config["precipitation_file"] = str(self.forcing["pr"])
-        self._config["temperature_file"] = str(self.forcing["tas"])
+        self._config["inp_file"] = str(self.parameter_set["inp_file"])
+        self._config["data_file"] = str(self.parameter_set["data_file"])
 
         for kwarg in kwargs:  # Write any kwargs to the config.
             self._config[kwarg] = kwargs[kwarg]
 
-        config_file = self._cfg_dir / "leakybucket_config.json"
+        config_file = self._cfg_dir / "swmm_config.json"
 
         with config_file.open(mode="w") as f:
             f.write(json.dumps(self._config, indent=4))
@@ -44,8 +44,8 @@ class LeakyBucketMethods(eWaterCycleModel):
         return self._config.items()
 
 
-class LeakyBucket(ContainerizedModel, LeakyBucketMethods):
+class SWMM(ContainerizedModel, SWMMMethods):
     """The LeakyBucket eWaterCycle model, with the Container Registry docker image."""
     bmi_image: ContainerImage = ContainerImage(
-        "ghcr.io/ewatercycle/leakybucket-grpc4bmi:v0.0.1"
+        "ghcr.io/ewatercycle/swmm-grpc4bmi:v0.0.1"
     )
