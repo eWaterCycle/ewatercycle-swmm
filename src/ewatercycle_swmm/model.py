@@ -27,7 +27,7 @@ class SWMMMethods(eWaterCycleModel):
 
         self._config["inp_file"] = str(self.parameter_set.config)
         data_file = str(self.parameter_set.config).replace(".inp", ".data")
-        if data_file.exists():
+        if Path(data_file).exists():
             self._config["data_file"] = data_file
 
         for kwarg in kwargs:  # Write any kwargs to the config.
