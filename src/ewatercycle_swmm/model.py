@@ -9,6 +9,17 @@ from ewatercycle.base.parameter_set import ParameterSet
 from ewatercycle.base.model import ContainerizedModel, eWaterCycleModel, LocalModel
 from ewatercycle.container import ContainerImage
 
+# def import_bmi():
+#     """"Import BMI, raise useful exception if not found"""
+#     try:
+#         from ewatercycle.SWMM import SWMM as swmm_bmi
+#     except ModuleNotFoundError:
+#         msg = (
+#             "SWMM bmi package not found, install using: `pip install HBV`"
+#         )
+#         raise ModuleNotFoundError(msg)
+
+#     return swmm_bmi
 
 class SWMMMethods(eWaterCycleModel):
     """The eWatercycle SWMM model.
@@ -51,7 +62,7 @@ class SWMMMethods(eWaterCycleModel):
         """
         # remove bmi
         self._bmi.finalize()
-    del self._bmi
+        del self._bmi
 
     
 class SWMM(ContainerizedModel, SWMMMethods):
@@ -60,6 +71,6 @@ class SWMM(ContainerizedModel, SWMMMethods):
         "ghcr.io/ewatercycle/swmm-grpc4bmi:v0.0.1"
     )
 
-class SWMMLocal(LocalModel, SWMMMethods):
-    """The HBV eWaterCycle model, with the local BMI."""
-    bmi_class: Type[Bmi] = import_bmi()
+# class SWMMLocal(LocalModel, SWMMMethods):
+#     """The HBV eWaterCycle model, with the local BMI."""
+#     bmi_class: Type[Bmi] = import_bmi()
