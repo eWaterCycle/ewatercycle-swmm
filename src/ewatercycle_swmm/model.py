@@ -6,7 +6,7 @@ from typing import Any
 
 # from ewatercycle.base.forcing import GenericDistributedForcing
 from ewatercycle.base.parameter_set import ParameterSet
-from ewatercycle.base.model import ContainerizedModel, eWaterCycleModel
+from ewatercycle.base.model import ContainerizedModel, eWaterCycleModel, LocalModel
 from ewatercycle.container import ContainerImage
 
 
@@ -44,9 +44,22 @@ class SWMMMethods(eWaterCycleModel):
     def parameters(self) -> ItemsView[str, Any]:
         return self._config.items()
 
+    def finalize(self) -> None:
+        """Perform tear-down tasks for the model.
+    
+        After finalization, the model should not be used anymore.
+        """
+        # remove bmi
+        self._bmi.finalize()
+    del self._bmi
 
+    
 class SWMM(ContainerizedModel, SWMMMethods):
-    """The LeakyBucket eWaterCycle model, with the Container Registry docker image."""
+    """The SWMM eWaterCycle model, with the Container Registry docker image."""
     bmi_image: ContainerImage = ContainerImage(
         "ghcr.io/ewatercycle/swmm-grpc4bmi:v0.0.1"
     )
+
+class SWMMLocal(LocalModel, SWMMMethods):
+    """The HBV eWaterCycle model, with the local BMI."""
+    bmi_class: Type[Bmi] = import_bmi()
