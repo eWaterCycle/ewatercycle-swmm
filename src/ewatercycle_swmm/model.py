@@ -42,7 +42,7 @@ class SWMMMethods(eWaterCycleModel):
         inp_file = self._stage_input_files(source_inp, run_dir)
         
         # inp_file = run_dir / Path(self.parameter_set.config).name
-        data_file = inp_file.with_suffix(".data")
+        data_file = inp_file.with_suffix(".dat")
 
         self._config["inp_file"] = str(inp_file)
 
