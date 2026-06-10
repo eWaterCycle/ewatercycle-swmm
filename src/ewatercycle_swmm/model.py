@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Any
 import os
 from shutil import copy2
+from bmipy import Bmi
 
 # from ewatercycle.base.forcing import GenericDistributedForcing
 from ewatercycle.base.parameter_set import ParameterSet
@@ -35,23 +36,6 @@ class SWMMMethods(eWaterCycleModel):
 
     def _make_cfg_file(self, **kwargs) -> Path:
         """Write model configuration file."""
-        # self._config["inp_file"] = str(self.parameter_set["config"]["inp_file"])
-        # self._config["data_file"] = str(self.parameter_set["config"]["data_file"])
-
-        # self._config["inp_file"] = str(self.parameter_set.config)
-        # data_file = str(self.parameter_set.config).replace(".inp", ".data")
-        # if Path(data_file).exists():
-        #     self._config["data_file"] = data_file
-
-        # out_file = str(self.parameter_set.config).replace(".inp", ".out")
-        # self._config["out_file"] = out_file
-
-        # rpt_file = str(self.parameter_set.config).replace(".inp", ".rpt")
-        # self._config["rpt_file"] = rpt_file
-        
-        # for kwarg in kwargs:  # Write any kwargs to the config.
-        #     self._config[kwarg] = kwargs[kwarg]
-
         run_dir = self._cfg_dir.resolve()
 
         source_inp = Path(self.parameter_set.config).resolve()
@@ -97,39 +81,31 @@ class SWMMMethods(eWaterCycleModel):
         self._bmi.finalize()
         del self._bmi
 
-    # ensures that bmi is called instead of the pySWMM simulation object
-    # def __getattr__(self, name):
-    #     bmi = self.__dict__.get("_bmi", None)
-    
-    #     if bmi is not None and hasattr(bmi, name):
-    #         return getattr(bmi, name)
-    
-    #     raise AttributeError(name)
     
 class SWMM(ContainerizedModel, SWMMMethods):
     """The SWMM eWaterCycle model, with the Container Registry docker image."""
     bmi_image: ContainerImage = ContainerImage(
         "ghcr.io/ewatercycle/swmm-grpc4bmi:v0.0.3"
     )
-
-    # ensures that bmi is called instead of the pySWMM simulation object
-    # def __getattr__(self, name):
-    #     bmi = self.__dict__.get("_bmi", None)
     
-    #     if bmi is None:
-    #         raise AttributeError(
-    #             f"{name} not available yet: BMI not initialized (call setup() first)"
-    #         )
-    
-    #     return getattr(bmi, name)
-
-    # def __getattr__(self, name):
-    #     bmi = self.__dict__.get("_bmi", None)
-    
-    #     if bmi is not None and hasattr(bmi, name):
-    #         return getattr(bmi, name)
-    
-    #     raise AttributeError(name)
+    # Ensures that bmi is called instead of the pySWMM simulation object
+    def __getattr__(self, name: str):
+        # Never delegating dunders / pydantic internals -> avoids init-time recursion.
+        if name.startswith("__") and name.endswith("__"):
+            raise AttributeError(name)
+        # 1) Let pydantic resolve fields + private attrs (incl. _bmi) first.
+        try:
+            return super().__getattr__(name)
+        except AttributeError:
+            pass
+        # 2) Fall back to the BMI instance for anything eWaterCycle doesn't expose.
+        private = object.__getattribute__(self, "__pydantic_private__")
+        bmi = (private or {}).get("_bmi")
+        if bmi is not None and hasattr(bmi, name):
+            return getattr(bmi, name)
+        raise AttributeError(
+            f"{type(self).__name__!r} object has no attribute {name!r}"
+        )
 
 # class SWMMLocal(LocalModel, SWMMMethods):
 #     """The HBV eWaterCycle model, with the local BMI."""
