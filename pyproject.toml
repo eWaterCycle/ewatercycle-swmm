@@ -11,7 +11,7 @@ description = "Storm Water Management Model"
 readme = "README.md"
 license = "Apache-2.0"
 authors = [
-  { name = "Mark Melotto", email = "mmelotto@tudelft.nl" },
+  { name = "Mark Melotto", email = "markmelotto@tudelft.nl" },
 ]
 keywords = ["ewatercycle", "hydrology"]
 classifiers = [
