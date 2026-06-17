@@ -59,9 +59,11 @@ the drainage network and the simulation options. It can be created with QGIS via
 the [generate_swmm_inp](https://github.com/Jannik-Schilling/generate_swmm_inp)
 plugin, or with any other SWMM model builder.
 
-> **Note:** if your model uses an external time series data file, it currently
-> has to share the name of the `.inp` file (i.e. `example.dat` next to
-> `example.inp`). It is picked up automatically when present.
+> **Note:** any external data files referenced by the `.inp` (e.g. a time series
+> `example.dat`) must sit **next to the `.inp` in the parameter-set directory**,
+> since SWMM resolves them relative to the input file. The `.inp` and its data
+> files are read directly from that directory — they are not copied into the run
+> directory.
 
 The input file is provided to eWaterCycle through a `ParameterSet`:
 
@@ -177,15 +179,40 @@ model.finalize()
 - [`SWMM`](src/ewatercycle_swmm/model.py) is a `ContainerizedModel` that points
   at the `ghcr.io/ewatercycle/swmm-grpc4bmi` image built from
   [eWaterCycle/swmm-bmi](https://github.com/eWaterCycle/swmm-bmi).
-- `setup()` stages the `.inp` (and optional `.dat`) file into a run directory and
-  writes a `swmm_config.json` configuration file that the container reads on
-  `initialize()`.
+- `setup()` writes a `swmm_config.json` configuration file (read by the container
+  on `initialize()`) into a per-run directory. It points the container at the
+  `.inp` **in place** in the parameter-set directory — which eWaterCycle mounts
+  into the container — rather than copying it. SWMM's writable outputs (the
+  `.rpt` report and `.out` binary) are directed into the run directory instead,
+  so nothing is copied on each run.
 - Any attribute eWaterCycle does not expose itself is delegated to the underlying
   BMI/pySWMM `Simulation` object, so you can largely treat the model like a
   pySWMM `Simulation`.
 
 For the BMI implementation, the container build, and the full list of exposed
 variables, see the [swmm-bmi repository](https://github.com/eWaterCycle/swmm-bmi).
+
+## Development
+
+Install the package with its development dependencies and run the test suite:
+
+```console
+pip install -e .[dev]
+pytest
+```
+
+The tests are intentionally lightweight and do **not** start a container or run
+the model:
+
+- `tests/test_metadata.py` checks the package metadata (version, plugin entry
+  point, container image reference) and the bundled `example.inp`. These need
+  only the standard library, so they run anywhere.
+- `tests/test_model.py` checks the `SWMM` wrapper class wiring. These require
+  `ewatercycle` to be importable and are **skipped** automatically when it is
+  not installed.
+
+On a machine without `ewatercycle` you will see the metadata tests pass and the
+model tests skipped; with `ewatercycle` installed all tests run.
 
 ## License
 
