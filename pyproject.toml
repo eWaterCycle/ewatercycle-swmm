@@ -29,6 +29,11 @@ dependencies = [
 ]
 dynamic = ["version"]
 
+[project.optional-dependencies]
+dev = [
+  "pytest",
+]
+
 # This registers the plugin such that it is discoverable by eWaterCycle
 [project.entry-points."ewatercycle.models"]
 SWMM = "ewatercycle_swmm.model:SWMM"
