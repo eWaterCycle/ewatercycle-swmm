@@ -217,4 +217,6 @@ model tests skipped; with `ewatercycle` installed all tests run.
 ## License
 
 `ewatercycle-swmm` is distributed under the terms of the
-[Apache-2.0](https://spdx.org/licenses/Apache-2.0.html) license.
+[BSD-2-Clause](https://spdx.org/licenses/BSD-2-Clause.html) license, following
+the license of [pySWMM](https://github.com/pyswmm/pyswmm). See
+[`LICENSE.txt`](LICENSE.txt).

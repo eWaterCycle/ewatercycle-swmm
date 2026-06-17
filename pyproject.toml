@@ -9,14 +9,14 @@ path = "src/ewatercycle_swmm/__init__.py"
 name = "ewatercycle-swmm"
 description = "Storm Water Management Model"
 readme = "README.md"
-license = "Apache-2.0"
+license = "BSD-2-Clause"
 authors = [
   { name = "Mark Melotto", email = "markmelotto@tudelft.nl" },
 ]
 keywords = ["ewatercycle", "hydrology"]
 classifiers = [
   "Intended Audience :: Developers",
-  "License :: OSI Approved :: Apache Software License",
+  "License :: OSI Approved :: BSD License",
   "Natural Language :: English",
   "Operating System :: OS Independent",
   "Programming Language :: Python",
