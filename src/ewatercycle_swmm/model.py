@@ -43,13 +43,20 @@ class SWMMMethods(eWaterCycleModel):
         run_dir = self._cfg_dir.resolve()
 
         source_inp = Path(self.parameter_set.config).resolve()
-        inp_file = self._stage_input_files(source_inp, run_dir)
+        # inp_file = self._stage_input_files(source_inp, run_dir)
+        inp_file = source_inp
 
         self._config["inp_file"] = str(inp_file)
 
-        for kwarg, value in kwargs.items():
-            self._config[kwarg] = value
+        report_file = self._cfg_dir / "report_file.rpt"
+        output_file = self._cfg_dir / "output_file.out"
 
+        for kwarg, value in kwargs.items():
+            self._config[kwarg] = str(value)
+
+        self._config["report_file"] = str(report_file)
+        self._config["output_file"] = str(output_file)
+        
         config_file = self._cfg_dir / "swmm_config.json"
         with config_file.open(mode="w") as f:
             f.write(json.dumps(self._config, indent=4))
@@ -105,7 +112,7 @@ class SWMMMethods(eWaterCycleModel):
 class SWMM(ContainerizedModel, SWMMMethods):
     """The SWMM eWaterCycle model, with the Container Registry docker image."""
     bmi_image: ContainerImage = ContainerImage(
-        "ghcr.io/ewatercycle/swmm-grpc4bmi:v0.0.3"
+        "ghcr.io/ewatercycle/swmm-grpc4bmi:v0.0.4"
     )
     
     # Ensures that bmi is called instead of the pySWMM simulation object
