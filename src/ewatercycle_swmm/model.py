@@ -2,29 +2,25 @@
 import json
 from collections.abc import ItemsView
 from pathlib import Path
-from typing import Any
-import os
-from shutil import copy2
+from typing import Any, Type
 from bmipy import Bmi
-import shlex
-import warnings
 
-# from ewatercycle.base.forcing import GenericDistributedForcing
+
 from ewatercycle.base.parameter_set import ParameterSet
 from ewatercycle.base.model import ContainerizedModel, eWaterCycleModel, LocalModel
 from ewatercycle.container import ContainerImage
 
-# def import_bmi():
-#     """"Import BMI, raise useful exception if not found"""
-#     try:
-#         from ewatercycle.SWMM import SWMM as swmm_bmi
-#     except ModuleNotFoundError:
-#         msg = (
-#             "SWMM bmi package not found, install using: `pip install ewatercycle-swmm`"
-#         )
-#         raise ModuleNotFoundError(msg)
+def import_bmi():
+    """"Import BMI, raise useful exception if not found"""
+    try:
+        from ewatercycle.SWMM import SWMM as swmm_bmi
+    except ModuleNotFoundError:
+        msg = (
+            "SWMM bmi package not found, install using: `pip install ewatercycle-swmm`"
+        )
+        raise ModuleNotFoundError(msg)
 
-#     return swmm_bmi
+    return swmm_bmi
 
 class SWMMMethods(eWaterCycleModel):
     """The eWatercycle SWMM model.
@@ -97,6 +93,6 @@ class SWMM(ContainerizedModel, SWMMMethods):
             f"{type(self).__name__!r} object has no attribute {name!r}"
         )
 
-# class SWMMLocal(LocalModel, SWMMMethods):
-#     """The HBV eWaterCycle model, with the local BMI."""
-#     bmi_class: Type[Bmi] = import_bmi()
+class SWMMLocal(LocalModel, SWMMMethods):
+    """The HBV eWaterCycle model, with the local BMI."""
+    bmi_class: Type[Bmi] = import_bmi()
