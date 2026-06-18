@@ -85,7 +85,7 @@ parameters = ParameterSet(
 ## Usage
 
 A worked example is provided in
-[`demo_containerized_model.ipynb`](demo_containerized_model.ipynb), which
+[`demo_containerized_model.ipynb`](demo_SWMM_model.ipynb), which
 reproduces the "Latte" example from the pySWMM website (`example.inp`). The
 essentials:
 
