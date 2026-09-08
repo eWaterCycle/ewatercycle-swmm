@@ -94,5 +94,5 @@ class SWMM(ContainerizedModel, SWMMMethods):
         )
 
 class SWMMLocal(LocalModel, SWMMMethods):
-    """The HBV eWaterCycle model, with the local BMI."""
+    """The SWMM eWaterCycle model, with the local BMI."""
     bmi_class: Type[Bmi] = import_bmi()
